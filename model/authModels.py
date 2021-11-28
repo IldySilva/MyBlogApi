@@ -10,3 +10,9 @@ class CreateUserModel(BaseModel):
     phone: str
     password: str
     name: str
+
+
+class PostModel(BaseModel):
+    content = ""
+    title = ""
+    personid = ""

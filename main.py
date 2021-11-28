@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 import psycopg2
 from pydantic.errors import JsonError
-from model.authModels import CreateUserModel, LoginModel
+from model.authModels import CreateUserModel, LoginModel, PostModel
 from fastapi.responses import JSONResponse
 
 import json
@@ -14,6 +14,18 @@ app = FastAPI()
 database = psycopg2.connect(
     host='localhost', dbname="myblog", user="postgres", password="root")
 cursor = database.cursor()
+
+
+@app.post("/createPost")
+def MakePost(postModel: PostModel):
+    try:
+
+        cursor.execute("insert into posts(title,content,personid)values (%s,%s,%s)",
+                       postModel.title, postModel.content, postModel.personid)
+        database.commit()
+
+    except Exception as error:
+        return ({"sucesso": False, "Mensagem": error.args})
 
 
 @app.get("/")
