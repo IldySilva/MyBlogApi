@@ -4,23 +4,18 @@ class UserModel:
     id: str
     name: str
 
-    def __init__(self, pwd, id, name, phone) -> None:
-        self.phone = phone,
-        self.pwd = pwd,
-        self.id = id,
+    def __init__(self, id, name, phone, pwd="") -> None:
+        self.phone = str(phone)
+        self.pwd = str(pwd)
+        self.id = str(id)
         self.name = name
 
-    def data() -> str:
-        return ""
-
     def fromJson(json):
-        return UserModel(pwd=str(json[0]), name=json[2], id=json[3], phone=json[1])
+        return UserModel(id=json[0], name=json[1], phone=json[2])
 
     def toJson(self):
         return ({
-
-            "pwd": self.pwd,
-            "id": self.id,
+            "id": str(self.id),
             "phone": self.phone,
             "nome": self.name,
 
