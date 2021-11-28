@@ -11,6 +11,7 @@ class UserModel:
         self.name = name
 
     def fromJson(json):
+
         return UserModel(id=json[0], name=json[1], phone=json[2])
 
     def toJson(self):
