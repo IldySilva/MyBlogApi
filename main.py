@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 import psycopg2
