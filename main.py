@@ -4,7 +4,6 @@ import psycopg2
 from pydantic.errors import JsonError
 from model.authModels import CreateUserModel, LoginModel
 from fastapi.responses import JSONResponse
-
 import json
 from model.postsModel import Post
 
