@@ -1,14 +1,9 @@
 from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
 import psycopg2
-from pydantic import errors
 import routes
 from psycopg2.extras import RealDictCursor
 
 from model.authModels import CreateUserModel, LoginModel, PostModel
-from fastapi.responses import JSONResponse
-import sqlalchemy
-import json
 from model.postsModel import Post
 
 from model.userModel import UserModel
