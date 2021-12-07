@@ -1,49 +1,60 @@
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 import psycopg2
-from pydantic.errors import JsonError
+from pydantic import errors
+import routes
+from psycopg2.extras import RealDictCursor
+
 from model.authModels import CreateUserModel, LoginModel, PostModel
 from fastapi.responses import JSONResponse
-
+import sqlalchemy
 import json
 from model.postsModel import Post
 
 from model.userModel import UserModel
+
 app = FastAPI()
+
 
 database = psycopg2.connect(
     host='localhost', dbname="myblog", user="postgres", password="root")
-cursor = database.cursor()
+cursor = database.cursor(cursor_factory=RealDictCursor)
 
 
 @app.post("/createPost")
 def MakePost(postModel: PostModel):
     try:
 
-        cursor.execute("insert into posts(title,content,personid)values (%s,%s,%s)",
-                       postModel.title, postModel.content, postModel.personid)
+        cursor.execute("insert into posts(title,content,personid)values (%s,%s,%s);",
+                       (postModel.title, postModel.content, postModel.personid))
         database.commit()
+        return ({"sucesso": False, "Mensagem": " Post Feito com sucesso"})
 
     except Exception as error:
+
         return ({"sucesso": False, "Mensagem": error.args})
 
 
 @app.get("/")
 def unreouted():
-
     return 'Simple  Blog API Using Python'
 
 
 @app.get("/posts")
 def getAllPosts():
-    posts = []
-    cursor.execute("select * from posts")
-    data = cursor.fetchall()
-    if data:
-        for index in data:
-            data = jsonable_encoder(Post.fromJson(index))
-            posts.append(data)
-            return JSONResponse(posts)
+    try:
+        posts = []
+        cursor.execute(
+            "select  posts.title,posts.content,posts.id as postId,posts.dateInserted ,person.name as personName,person.id as personId from posts inner join person on(posts.personid=person.id)")
+        data = cursor.fetchall()
+        database.commit()
+        print(data)
+        if data:
+
+            return data
+
+    except Exception as error:
+        return ({"sucesso": False, "mensagem": error.args})
 
 
 @app.get("/posts/userId")
@@ -51,13 +62,25 @@ def getFromUser(person: str):
     posts = []
     cursor.execute("select * from posts where personid=%s", person)
     data = cursor.fetchall()
+    database.commit()
     if data:
-        for index in data:
-            data = jsonable_encoder(Post.fromJson(index))
-            posts.append(data)
-            return JSONResponse(posts)
+        return data
+
     else:
         return "Este usuário não Tem nenhum post"
+
+
+@app.get("/userById/{id}")
+def userById(id):
+    try:
+        cursor.execute("select name,id,phone from person where id=%s", (id))
+        data = cursor.fetchall()
+        database.commit()
+        if data:
+            return data
+
+    except Exception as error:
+        return error
 
 
 @app.post("/login")
@@ -65,11 +88,9 @@ def doLogin(loginModel: LoginModel):
     cursor.execute("SELECT id,name,phone FROM person WHERE phone = %s AND pwd = %s",
                    (loginModel.phone, loginModel.password))
     data = cursor.fetchall()
+    database.commit()
     if data:
-
-        user = UserModel.fromJson(data[0])
-
-        return JSONResponse(jsonable_encoder(user))
+        return data[0]
 
     else:
         return {"Wrong Username or password"}

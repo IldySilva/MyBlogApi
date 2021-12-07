@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pydantic import BaseModel
 
 
@@ -13,6 +14,6 @@ class CreateUserModel(BaseModel):
 
 
 class PostModel(BaseModel):
-    content = ""
-    title = ""
-    personid = ""
+    content: str
+    title: str
+    personid: str
