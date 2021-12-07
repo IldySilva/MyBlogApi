@@ -52,10 +52,9 @@ def getAllPosts():
         return ({"sucesso": False, "mensagem": error.args})
 
 
-@app.get("/posts/userId")
-def getFromUser(person: str):
-    posts = []
-    cursor.execute("select * from posts where personid=%s", person)
+@app.get("/posts/{userId}")
+def getFromUser(userId):
+    cursor.execute("select * from posts where personid=%s", userId)
     data = cursor.fetchall()
     database.commit()
     if data:
